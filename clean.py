@@ -15,16 +15,28 @@ def is_admin():
 
 
 class c_Cleaner():
+
     def __init__(self):
         print('cleaner init')
-        pass
+        self.local = os.path.dirname(os.path.abspath(__file__))
+        self.downloads = os.path.join(
+            'C:', os.sep, 'Users', 'Alexander Kisby', "Downloads")
 
-    def clean(self):
-        print('clean')
-        pass
+    def clean(self, loc):
+        path = self.local if loc == 1 else self.downloads
+        self._clean(False, path)
 
-    def clean_strict(self):
-        pass
+    def clean_strict(self, loc):
+        path = self.local if loc == 1 else self.downloads
+        self._clean(True, path)
+
+    def _clean(self, strict, path):
+        print(f"{strict=}, {path=}")
+        os.chdir(path)
+        dir = os.listdir()
+        print(dir)
+        for file in dir:
+            pass
 
 
 class Application(ttk.Frame):
@@ -32,27 +44,43 @@ class Application(ttk.Frame):
         super().__init__(master)
         self.cleaner = c_Cleaner()
         self.master = master
+        self.loc = IntVar()
+        self.loc.set(1)
         self.pack()
         self.create_widgets()
 
     def create_widgets(self):
-        self.hi_there = ttk.Button(self)
-        self.hi_there["text"] = "Clean"
-        self.hi_there["command"] = self.cleaner.clean
-        self.hi_there.pack(side="top")
+        self.clean = ttk.Button(self)
+        self.clean_strict = ttk.Button(self)
+        self.clean["text"] = "Clean"
+        self.clean["command"] = lambda: self.cleaner.clean(self.loc.get())
+        self.clean_strict["text"] = "Clean Strictly"
+        self.clean_strict["command"] = lambda: self.cleaner.clean_strict(
+            self.loc.get())
+        self.clean_strict.pack(side="bottom")
+        self.clean.pack(side="bottom")
+        Label(root,
+              text="""Choose a folder location:""",
+              justify=LEFT).pack()
 
-        self.quit = ttk.Button(self, text="QUIT",
-                               command=self.master.destroy)
-        self.quit.pack(side="bottom")
+        ttk.Radiobutton(root,
+                        text="local",
+                        variable=self.loc,
+                        value=1).pack(anchor=W)
+
+        ttk.Radiobutton(root,
+                        text="Downloads",
+                        variable=self.loc,
+                        value=2).pack(anchor=W)
 
 
 if __name__ == '__main__':
-    print(os.listdir())
+
     if is_admin() or True:
         # Code of your program here
         print('starting')
         root = Tk(className='File Cleaner')
-        root.geometry("280x130")
+        root.geometry("280x150")
         app = Application(master=root)
         app.mainloop()
 
