@@ -1,2 +1,0 @@
-# fileCleaner
-cleans download folder
