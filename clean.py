@@ -1,7 +1,7 @@
-import time
+
 from tkinter import *
 from tkinter import ttk
-import json
+
 import os
 import ctypes
 import sys
@@ -15,9 +15,7 @@ def is_admin():
 
 
 class c_Cleaner():
-
     def __init__(self):
-        print('cleaner init')
         self.local = os.path.dirname(os.path.abspath(__file__))
         self.downloads = os.path.join(
             'C:', os.sep, 'Users', 'Alexander Kisby', "Downloads")
@@ -34,9 +32,33 @@ class c_Cleaner():
         print(f"{strict=}, {path=}")
         os.chdir(path)
         dir = os.listdir()
-        print(dir)
+
         for file in dir:
-            pass
+            if file == 'clean.py':
+                continue
+            if os.path.isdir(file):
+                print(file, 'isFolder')
+                continue
+            ext = self.get_ext(file)
+            src = os.path.join(path, file)
+            if strict:
+                if ext == '.zip':
+                    os.remove(src)
+                    print('DELETE ', file)
+                    continue
+
+            if not os.path.isdir(ext[1:] + 's'):
+                os.makedirs(os.path.join(path, ext[1:]+'s'))
+
+            dest = os.path.join(path, ext[1:] + 's', file)
+            os.rename(src, dest)
+            print('MOVED ', file)
+
+    def get_ext(self, filename):
+        index = filename.rfind('.')
+        if index == -1:
+            return '.unknown'
+        return filename[index:]
 
 
 class Application(ttk.Frame):
@@ -76,7 +98,7 @@ class Application(ttk.Frame):
 
 if __name__ == '__main__':
 
-    if is_admin() or True:
+    if is_admin():
         # Code of your program here
         print('starting')
         root = Tk(className='File Cleaner')
